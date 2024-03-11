@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+</head>
+<body>
+    {% if type == "home"  %}
+    <h3>Welcome to Web Upnp (Universel Plug and Play) Client</h3>
+    <a href="{{ url_for('search_devices') }}"> Start Search</a>
+    {% elif type == "search_devices"  %}
+    <h3>Fetched List</h3>
+    <ul>
+        {% for device in devices %}
+            <li><a href="{{ url_for('select_media',device_address=device.address,device_response=device.response) }}">Device {{device.friendly_name}}</a></li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+</body>
+</html>
