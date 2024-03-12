@@ -1,5 +1,6 @@
-from flask import Flask, render_template, redirect, url_for, request, session
+from flask import Flask, render_template, redirect, url_for, request, session, Response
 import upnp_helper
+import subprocess
 
 app = Flask(__name__)
 app.secret_key = "Karuppasamy22"
@@ -30,13 +31,44 @@ def select_media():
 
 @app.route('/media/')
 def media():
+    id = request.args.get("id")
     device = upnp_helper.get_device()
-    media = upnp_helper.media(device=device)
+    media = upnp_helper.media(device,id)
     return render_template(
         template_name_or_list="home.html",
         type="media",
         media=media
     )
+
+@app.route('/stream_video/')
+def stream_video():
+    # Use requests library to get the MKV file stream
+    mkv_url = request.args.get("mkv_url")
+    ffmpeg_command = [
+        'ffmpeg',
+        '-i', mkv_url,
+        '-f', 'mp4',
+        '-movflags', 'frag_keyframe+empty_moov',
+        '-vcodec', 'libx264',
+        '-preset', 'ultrafast',
+        '-tune', 'zerolatency',
+        '-vsync', 'vfr',
+        # '-an',  # Disable audio
+        'pipe:1'  # Output to stdout
+    ]
+
+    # Start FFmpeg process
+    ffmpeg_process = subprocess.Popen(ffmpeg_command, stdout=subprocess.PIPE)
+    def generate():
+        # Read FFmpeg stdout and yield it
+        while True:
+            chunk = ffmpeg_process.stdout.read(1024)
+            if not chunk:
+                break
+            yield chunk
+    # Create a response with the generator function
+    return Response(generate(), mimetype='video/mp4')
+
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -13,9 +13,33 @@
     <h3>Fetched List</h3>
     <ul>
         {% for device in devices %}
-            <li><a href="{{ url_for('select_media',device_address=device.address,device_response=device.response) }}">Device {{device.friendly_name}}</a></li>
+            <li><a href="{{ url_for('select_media',device_address=device.address,device_response=device.response) }}">{{device.friendly_name}}</a></li>
         {% endfor %}
     </ul>
+    {% elif type == "media" %}
+    <ul>
+        {% if media != None %}
+        {% for sub_media in media %}
+            {% if sub_media.class == "object.container.storageFolder" %}
+            <li><a href="{{ url_for('media',parentID=sub_media.parentID,id=sub_media.id) }}">{{sub_media.title}}</a>| {{sub_media.res}}</li>
+            {% elif sub_media.class == "object.item.videoItem" %}
+                {% if sub_media.res %}
+                    <li><a href="{{ url_for('stream_video',mkv_url=sub_media.res,id=sub_media.id,type='video') }}">{{sub_media.title}}</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('media',parentID=sub_media.parentID,id=sub_media.id,type='video') }}">{{sub_media.title}}</a></li>
+                {% endif %}
+            {% elif sub_media.class == "object.item.audioItem.musicTrack" %}
+            <li><a href="{{ url_for('media',parentID=sub_media.parentID,id=sub_media.id,type='audio') }}">{{sub_media.title}}</a>| {{sub_media.res}}</li>
+            {% elif sub_media.class == "object.container.genre.musicGenre" %}
+            <li><a href="{{ url_for('media',parentID=sub_media.parentID,id=sub_media.id,type='audio') }}">{{sub_media.title}} {{sub_media.res}}</a>| {{sub_media.res}}</li>
+            {% elif sub_media.class == "object.container.person.musicArtist" %}
+            <li><a href="{{ url_for('media',parentID=sub_media.parentID,id=sub_media.id,type='audio') }}">{{sub_media.title}} {{sub_media.res}}</a>| {{sub_media.res}}</li>
+            {% endif %}
+        {% endfor %}
+        {% else %}
+            <h1>No Media Found</h1>
+        {% endif %}
+    </ul>        
     {% endif %}
 </body>
 </html>
