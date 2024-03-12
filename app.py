@@ -58,16 +58,9 @@ def stream_video():
     ]
 
     # Start FFmpeg process
-    ffmpeg_process = subprocess.Popen(ffmpeg_command, stdout=subprocess.PIPE)
-    def generate():
-        # Read FFmpeg stdout and yield it
-        while True:
-            chunk = ffmpeg_process.stdout.read(1024)
-            if not chunk:
-                break
-            yield chunk
+    subprocess.Popen(["vlc",mkv_url])
     # Create a response with the generator function
-    return Response(generate(), mimetype='video/mp4')
+    return "Done"
 
 
 if __name__ == '__main__':
