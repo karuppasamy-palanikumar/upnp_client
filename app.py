@@ -1,8 +1,11 @@
 from flask import Flask, render_template, redirect, url_for, request, session, Response
+from flask_cors import CORS
 import upnp_helper
 import subprocess
+import requests
 
 app = Flask(__name__)
+CORS(app) 
 app.secret_key = "Karuppasamy22"
 
 @app.route('/')
@@ -40,27 +43,44 @@ def media():
         media=media
     )
 
+@app.route('/get_video')
+def get_video():
+    mkv_url = request.args.get("mkv_url")
+    response = requests.get(mkv_url, stream=True)
+    return Response(response.iter_content(chunk_size=1024), content_type=response.headers['content-type'])
+
 @app.route('/stream_video/')
 def stream_video():
     # Use requests library to get the MKV file stream
     mkv_url = request.args.get("mkv_url")
-    ffmpeg_command = [
-        'ffmpeg',
-        '-i', mkv_url,
-        '-f', 'mp4',
-        '-movflags', 'frag_keyframe+empty_moov',
-        '-vcodec', 'libx264',
-        '-preset', 'ultrafast',
-        '-tune', 'zerolatency',
-        '-vsync', 'vfr',
-        # '-an',  # Disable audio
-        'pipe:1'  # Output to stdout
-    ]
+    return render_template(
+        template_name_or_list="stream.html",
+        type="media",
+        mkv_url=mkv_url
+    )
+    # ffmpeg_command = [
+    #     'ffmpeg',
+    #     '-i', mkv_url,
+    #     '-f', 'mp4',
+    #     '-movflags', 'frag_keyframe+empty_moov',
+    #     '-vcodec', 'libx264',
+    #     '-preset', 'ultrafast',
+    #     '-tune', 'zerolatency',
+    #     '-vsync', 'vfr',
+    #     '-hls_time', '30',
+    #     # '-an',  # Disable audio
+    #     'pipe:1'  # Output to stdout
+    # ]
+    # ffmpeg_process = subprocess.Popen(ffmpeg_command, stdout=subprocess.PIPE)
 
-    # Start FFmpeg process
-    subprocess.Popen(["vlc",mkv_url])
-    # Create a response with the generator function
-    return "Done"
+    # def generate():
+    #     while True:
+    #         chunk = ffmpeg_process.stdout.read(1024)
+    #         if not chunk:
+    #             break
+    #         yield chunk
+
+    # return Response(generate(), mimetype='video/mp4')
 
 
 if __name__ == '__main__':

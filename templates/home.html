@@ -40,12 +40,6 @@
             <h1>No Media Found</h1>
         {% endif %}
     </ul>
-    {% elif type == "stream" %}
-    <h1>Streaming Video</h1>
-    <video controls>
-        <source src="{{ url_for('stream_video',mkv_url=mkv_url) }}" type="video/mp4">
-        Your browser does not support the video tag.
-    </video>
     {% endif %}
 </body>
 </html>

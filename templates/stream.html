@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Video Player</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" crossorigin="anonymous"></script>
+    <script>
+      $(document).ready(function(){
+        play();
+      });
+      function play(){
+        var video=$(this).attr('id');
+        $.get("{{ url_for('get_video',mkv_url=mkv_url) }}",function(){})
+      }
+    </script>
+  </head>
+  <body>
+
+    <div id="main" class="container">
+      <div id="icons" class="row">
+
+      </div>
+    </div>
+
+  </body>
+</html>
